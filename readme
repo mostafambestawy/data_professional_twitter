@@ -1,0 +1,2 @@
+conda install -c conda-forge tweepy 
+conda install -c jmcmurray json 

@@ -1,0 +1,808 @@
+
+What is a regular expression?
+
+REGular EXpression or regex: String containing a combination of normal characters and special metacharacters that describes patterns to find text or positions within a text.
+Let’s break this definition down to understand it better.
+
+r'st\d\s\w{3,10}'
+
+    r: In python, the r at the beginning indicates a raw string. It is always advisable to use it.
+
+    'st': We said that a regex contains normal characters, or literal characters we already know. Those normal characters match themselves. So ‘st’ exactly matches an ‘s’ followed by a ‘t’.
+
+    '\d': regex also contain special characters. Metacharacters represent types of characters. Here for example backslash \d represent a digit.
+
+    '\s': a white-space.
+
+    '\w': a word character.
+
+    '{3,10}': Metacharacters can also represent ideas, such as location or quantity. In the example, 3 and 10 inside curly braces indicates that the character immediately to the left, in this case \w, should appear between 3 and 10 times.
+
+    As mentioned above, regex represents a pattern, a pattern is a sequence of characters that maps to words or punctuation.
+
+    As a data analyst you will use pattern matching to:
+        Find and replace specific text.
+        Validate strings such as passwords and email addresses.
+
+regex are very powerful and fast as they allow you to search complex patterns that would be very difficult to find otherwise.
+1. Python re Module:
+
+This is a module to handle regex. Some of its uses are:
+a- Find all matches of a pattern:
+
+re.findall(r"regex", string)
+EX:
+
+re.findall(r"#movies", "Love #movies! I had fun yesterday going to the #movies")
+
+Output:
+['#movies', '#movies']
+b- Split string at each match:
+
+re.split(r"regex", string)
+EX:
+
+re.split(r"!", "Nice Place to eat! I'll come back! Excellent meat!")
+Output:
+['Nice Place to eat', " I'll come back", ' Excellent meat', '']
+c- Replace one or many matches with a string:
+
+re.sub(r"regex",new, string)
+Ex:
+
+re.sub(r"yellow", "nice", "I have a yellow car and a yellow house in a yellow neighborhood")
+
+Output
+'I have a nice car and a nice house in a nice neighborhood'
+2. Supported metacharacters:
+Metacharacter 	Meaning
+\d 	Digit
+\D 	Non-digit
+\w 	Word character
+\W 	Non-word character
+\s 	Whitespace
+\S 	Non-Whitespace
+Examples:
+
+    re.findall(r"User\d", "The winners are: User9, UserN, User8")
+
+Output:
+['User9', 'User8']
+
+    re.findall(r"User\D", "The winners are: User9, UserN, User8")
+
+Output:
+['UserN']
+
+**If you want to find all matches of the pattern containing 'User' followed by any digit or normal character, you can use '\w'. We get all following matches.
+
+    re.findall(r"User\w", "The winners are: User9, UserN, User8")
+
+Output:
+
+['User9', 'UserN', 'User8']
+
+In the following example we need to find the price in a string. We use '\W' to match the dollar sign followed by a digit '\d'.
+
+re.findall(r"\W\d", "This skirt is on sale, only $5 today!")
+
+Output:
+
+['$5']
+
+Finally, we use '\s' to specify the pattern Data - Whitespace - science
+
+    re.findall(r"Data\sScience", "I enjoy learning Data Science")
+
+Output:
+['Data Science']
+
+**We use '\S' to detect the matches of 'ice', followed by any non-space character, followed by 'cream' and replace them with the world 'ice cream'.
+
+    re.sub(r"ice\Scream", "ice cream", "I really like ice-cream")
+
+Output:
+'I really like ice cream'
+3. Repetitions:
+a. Repeated characters:
+
+Let’s imagine that we are given the task to validate a password. It should contain 8 characters followed by four numbers.
+
+    Validate the following string: 'password1234'
+
+To search for a pattern we can use the method .search(). It takes the regex and string and tell us if there is a match.
+
+import re
+password = "password1234"
+
+    We can use '\w' eight times to match the first part and '\d' four times to match the last part.
+
+re.search(r"\w\w\w\w\w\w\w\w\d\d\d\d", password)
+<_sre.SRE_Match object; span=(0, 12), match='password1234'>
+
+Yet this is really impractical and cumbersome for longer regex. Instead we can use *quantifiers to save the situation.
+
+    Quantifiers:
+    A metacharacter that tells the regex
+    engine how many times to match a
+    character immediately to its left.
+
+So, our previous code would have looked like this:
+
+re.search(r"\w{8}\d{4}", password)
+<_sre.SRE_Match object; span=(0, 12), match='password1234'>
+
+b. Quantifiers:
+1. Once or more: +
+
+In the following string we want to match the dates. We can see that the pattern is on or multiple digits, dash,and again one or multiple digits. The plus + metacharacter indicates a character that appears once or more times.
+
+text = "Date of start: 4-3. Date of registration: 10-04."
+
+Let’s construct the regex from simple to complex. We will use the .findall() method.
+
+    re.findall(r" ", text)
+
+We indicate that the digit, '\d' should appear once or more times adding the + quantifier followed by a dash -
+
+    re.findall(r"\d+- ", text)
+
+Then again a digit '\d' that should appear once or more times, so again we use the plus + quantifier.
+
+    re.findall(r"\d+-\d+", text)
+
+We now get the two matches that we expected:
+
+Output:
+['4-3', '10-04']
+2. Zero times or more: *
+
+The star * metacharacter to indicate that a character should appear zero or more times. Having the following string, we want to find all mentions of users, which start with an @. We notice that they could contain or not contain a non-world character in the middle
+
+my_string = "The concert was amazing! @ameli!a @joh&&n @mary90"
+
+So, we construct our regex as seen in the code:
+an @, followed by '\w+' followed by ’\W*' and the star here to indicate an non-word character zero or more times, then ’\w+'
+
+re.findall(r"@\w+\W*\w+", my_string)
+
+Output:
+
+['@ameli!a', '@joh&&n', '@mary90']
+3. Zero times or once: '?`
+
+It indicates that a character should appear zero times or once.
+
+In the example below we want to find matches for the world color, which has spelling variations.
+
+text = "The color of this image is amazing. However, the colour blue could be brighter."
+
+So, our regex is r"colou?r" as the letter ‘u’ can appear once or zero times, so we add the question mark after it, then ‘r’.
+
+re.findall(r"colou?r", text)
+
+Output:
+
+['color', 'colour']
+4. n times at least, m times at most: {n, m}
+
+Finally we can use the curly braces to indicate a specific minimum and maximum times.
+
+In the example, we want to find all matches for a phone number.
+
+phone_number = "John: 1-966-847-3131 Michelle: 54-908-42-42424"
+
+We will use the .findall() method and construct our regex step by step.
+
+re.findall(r"                 ", phone_number)
+
+# the first digit is once or twice then dash - 
+re.findall(r"\d{1,2}- ", phone_number)
+
+# Then a digit 3 times followed by dash -
+re.findall(r"\d{1,2}-\d{3}- ", phone_number)
+
+# Then a digit twice or three times followed by dash -
+re.findall(r"\d{1,2}-\d{3}-\d{2,3}- ", phone_number)
+
+# finally a digit four or more times (at least 4 times)
+# Notice the second argument is left blank
+re.findall(r"\d{1,2}-\d{3}-\d{2,3}-\d{4,}", phone_number)
+
+Output:
+['1-966-847-3131', '54-908-42-42424']
+
+It’s important to remember that quantifiers applies directly to the character immediately to the left
+
+    r"apple+" : + applies to e and not to apple
+
+4. Other Useful Metacharacters:
+a. Looking for patterns
+
+Two different operations to nd a match:
+
+    re.search(r"regex", string)
+    re.match(r"regex", string)
+
+Both have the same syntax and are used to find a match. In the example, we use both methods to find a digit appearing four times.
+
+re.search(r"\d{4}", "4506 people attend the show")
+
+<_sre.SRE_Match object; span=(0, 4), match='4506'>
+
+re.match(r"\d{4}", "4506 people attend the show")
+
+<_sre.SRE_Match object; span=(0, 4), match='4506'>
+
+Both methods return an object with the match found.
+
+But actually there is a difference, the .match() is anchored at the beginning of the string. Let’s investigate that in the second example to find a match for a digit:
+
+re.search(r"\d+", "Yesterday, I saw 3 shows")
+
+<_sre.SRE_Match object; span=(17, 18), match='3'>
+
+As we can see, re.search() finds a match
+
+print(re.match(r"\d+","Yesterday, I saw 3 shows"
+
+None
+
+And re.match() does not find the match. This is because the first character do not match the regex.
+b. Match any character (except newline): .
+
+The dot metacharacter matches any character. In the example code we need to match links in the string.
+www.domain.com
+
+my_links = "Just check out this link: www.amazingpics.com. It has amazing photos!"
+
+We know a link starts with 'www' and ends with '.com'. So, our regex should look something like this
+
+re.findall(r"www     com", my_links)
+
+We don’t know how many characters are in between. So, we indicate that we want any character, a dot '.', once or more times, adding the plus '+'
+
+re.findall(r"www.+com", my_links)
+
+Output:
+['www.amazingpics.com']
+c. Start of the string: ^
+
+The circumflex anchors the regex to the start of a string.
+In the example, we find the pattern starting with 'the' followed by a whitespace then two digits and ending with 's'.
+
+my_string = "the 80s music was much better that the 90s"
+
+following what we learnt up till now:
+
+re.findall(r"the\s\d+s", my_string)
+
+We get the following two matches.
+
+Output:
+['the 80s', 'the 90s']
+
+Let’s add the anchor metacharacter '^':
+
+re.findall(r"^the\s\d+s", my_string)
+
+We get only one match that appears at the beginning of the string.
+Output:
+['the 80s']
+d. End of the string: $
+
+On the contrary, the dollar sign anchors the regex to the end of the string.
+
+my_string = "the 80s music hits were much better that the 90s"
+
+re.findall(r"the\s\d+s$", my_string)
+
+Output:
+['the 90s']
+
+What if we want to use characters like dollar sign or dot, which also have other meanings?
+e. Escape special characters: \
+
+We want to split the string by '.' and whitespace.
+
+my_string = "I love the music of Mr.Go. However, the sound was too loud."
+
+By the following regex:
+
+print(re.split(r".\s", my_string))
+
+The Output is not what we intended:
+
+['', 'lov', 'th', 'musi', 'o', 'Mr.Go', 'However', 'th', 'soun', 'wa', 'to', 'loud.']
+
+As the regex interprets the dot as any character. To solve this we need to escape the character by adding a backslash in front of the dot.
+
+print(re.split(r"\.\s", my_string))
+
+Now we get the correct output.
+
+['I love the music of Mr.Go', 'However, the sound was too loud.']
+
+f. OR operator
+Pipe Character: |
+
+In the following string, we want to match the word elephant. Yet it’s written with capital “E” and lower “e” the second time.
+
+my_string = "Elephants are the world's largest land animal! I would love to see an elephant one day"
+
+Using the pipe character, we can indicate that we want to match one variant OR the other.
+
+re.findall(r"Elephant|elephant", my_string)
+
+Obtaining both elephant matches
+
+['Elephant', 'elephant']
+
+Set of characters: [ ]
+
+The square brackets also represent the 'OR' operand. Inside them we can specify optional characters to match.
+
+In the following example we want to find a pattern that contains lowercase or uppercase letter followed by a digit.
+
+my_string = "Yesterday I spent my afternoon with my friends: MaryJohn2 Clary3"
+
+Using square brackets with lowercase ‘a-z’ to specify any lowercase letter. Then, uppercase ‘A-Z’ to indicate any uppercase letter. Then the + then \d.
+
+re.findall(r"[a-zA-Z]+\d", my_string)
+
+Getting the following matches.
+
+['MaryJohn2', 'Clary3']
+
+In the following string, we want to match the non-word character with whitespace.
+
+my_string = "My&name&is#John Smith. I%live$in#London."
+
+We can specify optional characters inside the square brackets.
+
+re.sub(r"[&#%$]" , " ", my_string)
+
+Output:
+'My name is John Smith. I live in London.'
+
+Another option to the square brackets is the addition of ^. The ^ transforms the expression inside square brackets to negative. In the example we add the ^ to specify we want the links that do not contain any number.
+
+my_links = "Bad website: www.99.com. Favorite site: www.hola.com"
+re.findall(r"www[^0-9]+com", my_links)
+
+Output:
+['www.hola.com']
+5. Greedy vs. non-greedy matching:
+
+This concept will dive deeper into how the quantifiers work.
+
+    There are Two types of matching methods:
+        Greedy
+        Non-greedy or lazy
+    Standard quantifiers are greedy by default: * , + , ? , {num, num}
+
+a. Greedy matching
+
+we say that standard quantifiers have a greedy behavior, meaning they will attempt to match as many characters as possible.
+
+    Greedy: match as many characters as possible
+
+    Doing so, they will return the longest the match found with a match attempt.
+
+Let’s take a look at this code:
+
+re.match(r"\d+", "12345bcada")
+
+We want to find a pattern that has one or more digit on the string. Our greedy quantifier will return the pattern '12345'
+
+<_sre.SRE_Match object; span=(0, 5), match='12345'>
+
+We can explain this in the following way: our quantifier will start by matching the first digit found, ‘1’. Because it is greedy, it will keep going to find ‘more’ digits and stop only when no other digit can be matched, returning '12345'
+image
+
+However, there is another characteristic that we should explore. If the greedy quantifier has matched so many characters that can not match the rest of pattern it will:
+
+    Backtracks when too many character matched.
+    Gives up characters matched earlier one at a time.
+
+Backtracking is like driving a car without a map, if you drive through a path and hit a dead end street, you need to backtrack along your road to an earlier point to take another street.
+To make this clearer, let’s take an example, we use the greedy quantifier '.*' to find anything, zero or more times, followed by the letters “h” “e” “l” “l” “o”.
+
+re.match(r".*hello", "xhelloxxxxxx")
+
+We can see that it returns the pattern 'xhello'.
+
+<_sre.SRE_Match object; span=(0, 6), match='xhello'>
+
+So, the greedy quantifier will start by matching as much as possible, the entire string. Then it tries to match the 'h', but there are no characters left. So, it backtracks, giving up one matched character. Trying again, it still doesn’t match the 'h', so it **backtracks one more step repeatedly till it finally matches the 'h' in the regex, and the rest of the characters.
+
+image
+image810×143 23.1 KB
+
+b. Non-greedy matching
+
+Meanwhile non-greedy quantifiers:
+
+    Lazy behavior: attempt to match as few characters as needed.
+    Returns the shortest match
+    To obtain non-greedy quantifiers, we can append ? to greedy quantifiers to convert them into lazy. Taking the same code as before, the non-greedy quantifier
+
+re.match(r"\d+?", "12345bcada")
+
+will return the pattern '1'
+
+<_sre.SRE_Match object; span=(0, 1), match='1'>
+
+In this case, our quantifier will start by matching the first digit found, '1'. Because it is non-greedy, it will stop there as we stated that we want ‘one or more’ and one is as few as needed.
+image
+
+    Non-greedy quantifiers also backtrack if they have matched so few characters that the rest of the pattern cannot match, they backtrack, expand the matched character one at a time and try again. Let’s take the same example code again. This time the lazy quantifier is used '.*?'. Interestingly, they obtain the same match 'xhello'.
+
+re.match(r".*?hello", "xhelloxxxxxx")
+
+<_sre.SRE_Match object; span=(0, 6), match='xhello'>
+
+But how this match was obtained is different from the first time. The lazy quantifier first matches as little as possible, nothing at all :smile:, leaving the entire string unmatched. Following that it tries to match the 'h', definitely it doesn’t work. So it backtracks, matching one more character, the 'x'. Then it tries again, this time matching the 'h', and afterwards, the rest of the regex.
+image
+6. Grouping and Capturing
+
+This is an advanced concept of regex “Capturing Groups”.
+Let’s say that we have the following text:
+
+“Clary has 2 friends who she spends a lot time with. Susan has 3 brothers while John has 4 sisters.”
+
+And we want to extract information about a person, how many and which type of relationships they have. So, we want to extract “Clary has 2 friends”, “Susan has 3 brothers”, and “John has 4 sisters”. We know the structure of the sentences. So, let’s try our first approach. We would write something like the following code, any upper or lowercase letter one or more times - followed whitespace - a word character one or more times - whitespace - a number one or more times - whitespace - and any word character.
+
+re.findall('[A-Za-z]+\s\w+\s\d+\s\w+', text)
+
+Output:
+
+['Clary has 2 friends', 'Susan has 3 brothers', 'John has 4 sisters']
+
+But what if we don’t want the word 'has'. Starting simple by trying to extract only the names. We can place parentheses to group and capture characters together.
+
+([A-Za-z]+)\s\w+\s\d+\s\w+
+image
+
+Through this we can retrieve only that group. Let’s see the code again after adding parentheses to group our first part of the regex:
+
+re.findall('([A-Za-z]+)\s\w+\s\d+\s\w+', text)
+
+In the output we see that the group was captured successfully.
+['Clary', 'Susan', 'John']
+
+In a similar fashion, we can place parentheses around the three groups that we want to capture
+image
+
+As shown in the image, each group will receive a number. The entire expression will be group zero. Then the first group 1, the second 2 and the third 3. These numbers are important and we will see how to use them later.
+
+Let’s see this in our code example:
+
+re.findall('([A-Za-z]+)\s\w+\s(\d+)\s(\w+)', text)
+
+Now in the output we get a list of tuples:
+
+[('Clary', '2', 'friends'),
+('Susan', '3', 'brothers'),
+('John', '4', 'sisters')]
+
+The first element of each tuple is the match captured corressponding to group one. The second to group 2 and the last to group 3.
+Match a specific sub-pattern in a pattern:
+
+As we already discussed, we can use capturing groups to match specific sub-pattern in a pattern.
+Use it for further processing:
+
+We can use this information for retrieving the groups by numbers as we’ll learn later.
+Organize the data:
+
+As we found out earlier, the matches were retrieved as lists.
+In the code, we placed the parentheses to capture the name of the owner, the number and which type of pets each one has. We can access the information retrieved by using indexing and slicing as in the code:
+
+pets = re.findall('([A-Za-z]+)\s\w+\s(\d+)\s(\w+)', "Clary has 2 dogs but John has 3 cats")
+pets[0][0]
+
+Output:
+'Clary'
+Apply a quantifier to the entire group:
+
+Remember that quantifiers apply to the character immediately to the left.
+
+r"apple+" : + applies to e and not to apple
+
+In the same way, we can place parentheses to group characters and then apply the quantifier to the entire group.
+
+re.search(r"(\d[A-Za-z])+", "My user name is 3e4r5fg")
+
+In the code, parentheses were placed to match the group containing a number and any letter, then followed by the + quantifier to specify that we want this group repeated once or more times.
+
+Output:
+<_sre.SRE_Match object; span=(16, 22), match='3e4r5f'>
+
+But be careful. It’s not the same to capture a repeated group (\d+) than repeat a capturing group (\d)+
+
+    In the first code below, we use re.findall() to match a capturing group containing one number. We want the capturing group to be repeated once or more times. We get 5 and 3 as output because these numbers are repeated consecutively one or more times.
+
+my_string = "My lucky numbers are 8755 and 33"
+re.findall(r"(\d)+", my_string)
+
+Output:
+
+['5', '3']
+
+    In the following code, we specify that we should capture a group containing one or more repetitions of a number.
+
+re.findall(r"(\d+)", my_string)
+
+Output:
+`[‘8755’, ‘33’]
+Alternation and non-capturing groups:
+Pipe:
+
+    Vertical bar or pipe: |
+
+Suppose we have the following string.
+
+my_string = "I want to have a pet. But I don't know if I want a cat, a dog or a bird."
+
+And we want to find all matches for pet names. Using the pipe operator help matching cat
+or dog or bird as in the code below:
+
+re.findall(r"cat|dog|bird", my_string)
+
+Output:
+['cat', 'dog', 'bird']
+
+Changing the string a little bit and finding the all the pet names, but this time only those that come after a number and a whitespace:
+
+my_string = "I want to have a pet. But I don't know if I want 2 cats, 1 dog or a bird."
+re.findall(r"\d+\scat|dog|bird", my_string)
+
+Output:
+['2 cat', 'dog', 'bird']
+
+Unfortunately, we got a wrong output. Why?
+image
+
+The pipe operator works comparing everything that’s to its left (digit, whitespace, cat) with everything to the right, dog then bird.
+Alternation:
+
+In order to solve this, use groups to choose between optional patterns.
+
+This is called alternation, in which we use parentheses again to group the optional characters as the following:
+
+\d+\s(cat|dog|bird)
+
+my_string = "I want to have a pet. But I don't know if I want 2 cats, 1 dog or a bird."
+re.findall(r"\d+\s(cat|dog|bird)", my_string)
+
+Output:
+['cat', 'dog']
+
+Now, this is the correct match as only these two patterns followed a number and whitespace.
+
+Continuing with the previous example, we may also want to match the number. By placing parentheses to capture the digit group:
+
+(\d+)\s(cat|dog|bird)
+
+my_string = "I want to have a pet. But I don't know if I want 2 cats, 1 dog or a bird."
+re.findall(r"(\d)+\s(cat|dog|bird)", my_string)
+
+Output:
+[('2', 'cat'), ('1', 'dog')]
+Non-capturing groups
+
+Sometimes, we need to group characters using parentheses. But without referencing back to this group. For these cases, there are a special type of groups called non-capturing groups. For using them we just need to add ?: inside the parenthesis but before the regex: (?:regex)
+
+Having the following string:
+
+my_string = "John Smith: 34-34-34-042-980, Rebeca Smith: 10-10-10-434-425"
+
+We want to find all matches of numbers. We see that the pattern consists of two numbers and dash repeated three times. After that, three numbers, dash, three numbers. We want to extract only the last part without the first three repeated elements.
+
+We need to group the first two elements to indicate repetitions. But don’t want to capture them. Here non-capturing groups come to the rescue.
+image
+
+We group \d repeated two times and dash -: \d{}2- Then we indicate this group should be repeated 3 times: (?: \d{}2-){3}.
+Then, we group \d repeated three times \d{3} , then dash \d repeated three times:
+
+(?: \d{}2-){3}(\d{3}-\d{3})
+
+Then we match the regex to the string:
+
+my_string = "John Smith: 34-34-34-042-980, Rebeca Smith: 10-10-10-434-425"
+re.findall(r"(?:\d{2}-){3}(\d{3}-\d{3})", my_string)
+
+Output:
+['042-980', '434-425'] the numbers we were looking for.
+Use non-capturing groups for alternation:
+
+Finally, we can combine non-capturing groups and alternation together.
+
+As we know that alternation implies using parentheses and the pipe operand to group optional characters.
+
+my_date = "Today is 23rd May 2019. Tomorrow is 24th May 19."
+
+# Match all the numbers of the day but not the letters that follow.
+re.findall(r"(\d+)(?:th|rd)", my_date)
+
+Output:
+['23', '24']
+7. Backreferences
+
+Moving to back referencing capturing groups.
+Numbered groups
+
+Imagine that we came across this text and we want to extract the date highlighted. But we want to extract only the numbers.
+image
+
+So, we can place parentheses in a regex to capture these groups as we learned.
+(\d{1,2})-(\d{1,2})-(\d{4})
+
+We know by now that each of these groups receives a number. The whole expression is group 0 and the first is 1, and so on as shown earlier.
+
+text = "Python 3.0 was released on 12-03-2008."
+
+Using re.search() to match the pattern to the text. To retrieve the groups captured we can the method .group(group number).
+
+information = re.search('(\d{1,2})-(\d{2})-(\d{4})', text)
+information.group(3)
+
+Output:
+'2008'
+
+Retrieving group zero will output the entire expression.
+
+information.group(0)
+
+Output:
+'12-03-2008'
+
+Note: .group() can only be used with .search() and .match() methods
+Named groups:
+
+    Give a name to groups: (?P<name>regex)
+
+Let’s say we the following string. We want to match the name of the city and zipcode in different groups. Using the capturing and assign them the name city and zipcode as shown on the code below.
+
+text = "Austin, 78701"
+cities = re.search(r"(?P<city>[A-Za-z]+).*?(?P<zipcode>\d{5})", text)
+# retrieve the information using .group()
+cities.group("city")
+
+Output:
+'Austin'
+
+cities.group("zipcode")
+
+Output:
+'78701'
+
+There is another way to back reference a group. In fact, the matched group can be used inside the same regex or outside for substitution.
+We can do this using \number of the group as illustrated in the image below:
+image
+Using numbered capturing groups to reference back
+
+We have the following string. We want to find all matches of repeated characters. In the code, we specify theat we want to capture a sequence of word characters. Then a white space. Then we write \1
+
+sentence = "I wish you a happy happy birthday!"
+re.findall(r"(\w+)\s\1 ", sentence)
+
+This will indicate that we want to match the first group captured again. In other words, it says match that sequence of characters that was previously captured once more.
+
+Output:
+['happy']
+
+This was the repeated world in our string.
+
+Let’s now replace the repeated word with one occurrence of the same word. in the code the regex as before is used. This time, we use the .sub() method. In the replacement part, we can also reference back to the captured group. we write r"\1". This says replace the entire expression match with the first captured group.
+
+sentence = "I wish you a happy happy birthday!"
+re.sub(r"(\w+)\s\1", r"\1", sentence)
+
+Output:
+'I wish you a happy birthday!'
+
+As you can see, we have only one occurrence of the word 'happy'.
+Using named groups for back referencing:
+
+To do this, we use ? then capital P and equal sign = then the group name.
+(?p<name>regex) —> ?P=name
+
+In the code, we want to find all matches of the same number. We use a capturing group and name it code. Later, we reference back to this group to get the number as an output.
+
+sentence = "Your new code number is 23434. Please, enter 23434 to open the door."
+re.findall(r"(?P<code>\d{5}).*?(?P=code)", sentence)
+
+Output:
+['23434']
+Reference the group back for replacement:
+
+We need to use \g and the group name inside angle brackets: \g<name>
+
+In the code we want to replace repeated words by one occurrence of the same word. Inside the regex, we use the previous syntax. In the replacement field, we need to use this new syntax as seen in the code to get the output.
+
+sentence = "This app is not working! It's repeating the last word word."
+re.sub(r"(?P<word>\w+)\s(?P=word)", r"\g<word>", sentence)
+
+Output:
+
+'This app is not working! It's repeating the last word.'
+8. Lookaround
+
+This is a specific type of non-capturing groups, they help us look around an expression, i.e looking for what is behind or ahead of a pattern allowing us to confirm that sub-pattern is ahead or behind main pattern.
+
+Imagine that we have the following string:
+the withe cat sat on the chair
+
+We want to see what is surrounding a specific word. For example, we position ourselves in the word cat.
+
+image
+
+So look-around will allow us answer the following problem.
+
+    At my current position, look ahead and search if sat is there. Or look behind and search if white is there.
+
+Look-ahead
+
+    This is Non-capturing group
+    Checks that the first part of the expression is followed or not by the look-ahead expression
+    AS a consequence, it will return only the first part of the expression
+
+In the previous example, we are looking for the word cat. The look-ahead expression can be either positive or negative.
+
+    For positive: use (?=)
+    For negative: use (?!)
+
+image
+Positive look-ahead
+
+Let’s imaging that we have a string containing file names and the status of the file as shown in the code. We want to extract only those files that are followed by the word transferred.
+
+my_text = "tweets.txt transferred, mypass.txt transferred, keywords.txt error"
+
+So we start building the regex by indicating any world character followed by .txt.
+
+my_text = "tweets.txt transferred, mypass.txt transferred, keywords.txt error"
+re.findall(r"\w+\.txt                ", my_text)
+
+Then we indicate we want the first part to be followed by the word transferred. We do so by writing (?=\stransferred)
+
+my_text = "tweets.txt transferred, mypass.txt transferred, keywords.txt error"
+re.findall(r"\w+\.txt(?=\stransferred)", my_text)
+
+With that specification we get only the desired strings as shown in the ouput.
+Output:
+['tweets.txt', 'mypass.txt']
+Negative look-ahead
+
+In this case, we will say that we want those matches that are NOT followed by the expression transferred.
+
+my_text = "tweets.txt transferred, mypass.txt transferred, keywords.txt error"
+re.findall(r"\w+\.txt(?!\stransferred)", my_text)
+
+Output:
+['keywords.txt']
+Look-behind
+
+This gets all matches that are preceded or not by a specific pattern. So, it will return pattern after look-behind expression
+
+image
+
+Let’s look at the following string. We want to find all matches of the names that are preceded by the word member. How do we construct our regex with positive look-behind? At the end or the regex, we’ll indicate we want a sequence of word characters withespace another sequence of word characters.
+Pay attention to the code, the look-behind expression goes before that expression.
+
+my_text = "Member: Angus Young, Member: Chris Slade, Past: Malcolm Young, Past: Cliff Williams."
+re.findall(r"(?<=Member:\s)\w+\s\w+", my_sentence)
+
+Output:
+['Angus Young', 'Chris Slade']
+Negative look-behind
+
+We want to find all matches of the word cat or dog that not preceded by the word brown.
+
+my_text = "My white cat sat at the table. However, my brown dog was lying on the couch."
+re.findall(r"(?<!brown\s)(cat|dog)", my_text)
+
+Output:
+['cat']
+
